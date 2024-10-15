@@ -17,6 +17,6 @@ for _ in range(t):
     up.insert(0,temp2)
     down.append(temp1)
 
-
-print(up)
-print(down)
+    print(*)
+    print(up)
+    print(down)

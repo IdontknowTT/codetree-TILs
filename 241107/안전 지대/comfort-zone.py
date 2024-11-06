@@ -1,11 +1,12 @@
-# 입력 받
-n,m = map(int, input().split())
-grid = [list(map(int, input().split())) for _ in range(n)] # n*m (세로로 n개)
+import copy
 
+# 입력 받기
+n, m = map(int, input().split())
+grid = [list(map(int, input().split())) for _ in range(n)] # n * m 격자
 
-# 일단 원본 격자 하나 복사해서 copy 격자의 K 이하는 다 0으로 만들고 초과는 1로 만들기
+# 원본 격자 복사 후 k 이하 0, 초과 1로 변환
 def make_grid(grid, k):
-    grid_copy = grid
+    grid_copy = copy.deepcopy(grid)  # 깊은 복사 사용
     for i in range(n):
         for j in range(m):
             if grid_copy[i][j] <= k:
@@ -14,43 +15,35 @@ def make_grid(grid, k):
                 grid_copy[i][j] = 1
     return grid_copy
 
+# 이동 가능한지 확인하는 함수
+def can_go(x, y):
+    if x < 0 or y < 0 or x >= n or y >= m:  # 범위 확인
+        return False
+    if visited[x][y]:  # 이미 방문했다면
+        return False
+    return True
 
-
-# dfs 안에서는 그 영역 잡은 애들은 visited
-def dfs(i,j):
-
-    # 상하좌우 다 탐색
-    dxs, dys = [1,0,-1,0], [0,1,0,-1]
+# DFS 함수
+def dfs(i, j):
+    visited[i][j] = True  # 방문 체크
+    dxs, dys = [1, 0, -1, 0], [0, 1, 0, -1]
     for dx, dy in zip(dxs, dys):
-        new_x = i+dxs
-        new_y = j+dys
-
-        if can_go(new_x, new_y):
-            visited[new_x][new_y] = True    
+        new_x, new_y = i + dx, j + dy
+        if can_go(new_x, new_y) and grid_copy[new_x][new_y] == 1:  # 새로운 위치가 1일 때만 이동
             dfs(new_x, new_y)
 
+# 결과 계산
+c = []
+for k in range(100):  # k를 1부터 100까지 탐색
+    count = 0
+    grid_copy = make_grid(grid, k)  # grid_copy 생성
+    visited = [[False for _ in range(m)] for _ in range(n)]  # 방문 초기화
     
-
-
-# k를 1~100번 돌려(각 집이 1이상 100이하) 
-# -> 이거 복잡도 괜찮나? (아니면 네모 안에 있는 숫자 set해서 하는 방법도 -> 아 안되나)
-visited = [[False *m]for _ in range(n)]
-count = 0
-
-for k in range(K):
-    # 일단 원본 격자 하나 복사해서 copy 격자의 K 이하는 다 0으로 만들고 초과는 1로 만들기
-    grid_copy = make_grid(grid, k) #함수 호출해서 grid_copy를 만들어오기
-
-
-    # for 격자 하나하나 다 보면서 
     for i in range(n):
         for j in range(m):
-            if grid[i][j] == 1 and not visited[i][j]: # 안전지대라면, 방문 안했다면
-                dfs(i,j) # # 그리고 dfs 들어가기
-                count += 1
+            if grid_copy[i][j] == 1 and not visited[i][j]:  # 안전지대이고 방문 안 했으면
+                dfs(i, j)  # DFS 시작
+                count += 1  # 안전지대 개수 증가
+    c.append(count)            
 
-
-
-
-
-print(count)
+print(max(c), c.index(max(c)))

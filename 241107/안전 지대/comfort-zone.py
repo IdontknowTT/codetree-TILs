@@ -2,7 +2,7 @@ import copy
 
 # 입력 받기
 n, m = map(int, input().split())
-grid = [list(map(int, input().split())) for _ in range(n)] # n * m 격자
+grid = [list(map(int, input().split())) for _ in range(n)]  # n * m 격자
 
 # 원본 격자 복사 후 k 이하 0, 초과 1로 변환
 def make_grid(grid, k):
@@ -33,8 +33,10 @@ def dfs(i, j):
             dfs(new_x, new_y)
 
 # 결과 계산
-c = []
-for k in range(100):  # k를 1부터 100까지 탐색
+max_safe_areas = 0
+best_k = 1
+
+for k in range(1, 101):  # k를 1부터 100까지 탐색
     count = 0
     grid_copy = make_grid(grid, k)  # grid_copy 생성
     visited = [[False for _ in range(m)] for _ in range(n)]  # 방문 초기화
@@ -44,6 +46,12 @@ for k in range(100):  # k를 1부터 100까지 탐색
             if grid_copy[i][j] == 1 and not visited[i][j]:  # 안전지대이고 방문 안 했으면
                 dfs(i, j)  # DFS 시작
                 count += 1  # 안전지대 개수 증가
-    c.append(count)            
+    
+    # 최대 안전지대 개수를 갱신하고, K가 더 작은 경우에만 갱신
+    if count > max_safe_areas:
+        max_safe_areas = count
+        best_k = k
+    elif count == max_safe_areas and k < best_k:
+        best_k = k
 
-print(max(c), c.index(max(c)))
+print(best_k, max_safe_areas)

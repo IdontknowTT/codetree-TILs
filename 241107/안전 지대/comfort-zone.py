@@ -46,4 +46,4 @@ for k in range(100):  # k를 1부터 100까지 탐색
                 count += 1  # 안전지대 개수 증가
     c.append(count)            
 
-print(c.index(max(c)), max(c))
+print(max(c), c.index(max(c)))
